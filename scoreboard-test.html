@@ -120,8 +120,9 @@ function pvRows(){
   if(sc==='time'){rem1=0;rem2=1900000;}
   if(sc==='paused'){run1=false;}
   var t1=pvSt(rem1,run1,[142,118],'home',{home:34,away:0},0,{home:'yellow',away:'white'});
-  if(sc==='record'){t1=pvSt(rem1,run1,[191,118],'home',{home:147,away:0},0,{home:'yellow',away:'white'});}
+  
   var t2=pvSt(rem2,true,[88,150],'away',{home:0,away:12},1,{home:'white',away:'yellow'});   // sheet home/away reversed on this one
+  if(sc==='record'){t2=pvSt(rem2,true,[88,197],'away',{home:0,away:147},1,{home:'white',away:'yellow'});}
   var none=(sc==='empty');
   // fixture A (Table 1): Norwood 2 vs Assiniboia 1, match 2 live, match 1 final
   R.push(pvRow('26-27w07-01',d,'Norwood','Rick Sparling','-30',200,'Curt Beaudoin','10',171,'Final',null,'Norwood 2','Assiniboia 1','Win','Loss'));
@@ -132,7 +133,7 @@ function pvRows(){
   if(sc==='onetable'||none){
     R.push(pvRow('26-27w07-02',d,'Norwood','Greg Babiak','15',0,'Tim Fulcher','-60',0,'Ready',null,'Norwood 1','Norwood 3'));
   }else{
-    R.push(pvRow('26-27w07-02',d,'Norwood','Randy Morningstar','35',150,'Tim Fulcher','-85',88,'Live',t2,'Norwood 1','Norwood 3'));
+    R.push(pvRow('26-27w07-02',d,'Norwood','Guy Smith','35',150,'Tim Fulcher','-85',88,'Live',t2,'Norwood 1','Norwood 3'));
   }
   R.push(pvRow('26-27w07-02',d,'Norwood','Darryl Yeo','0',0,'Warren Dyer','0',0,'',null,'Norwood 1','Norwood 3'));
   R.push(pvRow('26-27w07-02',d,'Norwood','Trevor Westwood','0',0,'Ayo Abraham-Ajayi','0',0,'',null,'Norwood 1','Norwood 3'));
