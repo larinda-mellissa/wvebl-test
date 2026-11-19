@@ -23,6 +23,7 @@ button{font-family:inherit}
 #boards{position:absolute;left:20px;top:92px;width:1880px;height:566px}
 .half{position:absolute;top:0;width:920px;height:566px;border:2px solid #1c2a40;border-radius:24px;background:#0b1424;overflow:hidden}
 .half.h1{left:0}.half.h2{left:940px}
+.half.h3{left:1266px}#boards.three .half{width:613px}#boards.three .half.h2{left:633px}#boards.three .hh{font-size:22px;letter-spacing:.1em;padding:0 18px}#boards.three .hh small{font-size:16px;letter-spacing:.06em}#boards.three .clock{font-size:78px;height:84px;line-height:84px}#boards.three .fx{font-size:18px;height:34px;line-height:34px}#boards.three .fx b{margin:0 8px}#boards.three .fx em{font-size:22px}#boards.three .plrow{padding:10px 10px 0}#boards.three .pl{width:273px;height:360px}#boards.three .pl.l{margin-right:10px}#boards.three .nm{font-size:25px;width:240px;left:14px;top:12px}#boards.three .hc{font-size:18px;left:14px;top:84px}#boards.three .sc{font-size:104px;line-height:104px;top:132px}#boards.three .sc.big4{font-size:80px}#boards.three .br{font-size:18px;left:14px}#boards.three .br b{font-size:28px}#boards.three .turn{font-size:14px;right:10px;top:82px;bottom:auto;padding:4px 9px;letter-spacing:.06em}
 .hh{height:52px;line-height:52px;padding:0 28px;font-size:28px;font-weight:900;letter-spacing:.18em;color:#2dd4bf;border-bottom:2px solid #1c2a40}
 .hh small{float:right;color:#7f93b2;font-size:22px;letter-spacing:.1em;font-weight:700}
 .clock{text-align:center;height:100px;line-height:100px;font-size:96px;font-weight:900;letter-spacing:-.03em;color:#ffd35a;border-bottom:2px solid #1c2a40}
@@ -110,11 +111,22 @@ function pvRow(fid,date,venue,hp,hh,hs,ap,ah,as,status,state,ht,vt,hwl,awl){
 }
 function pvSt(remMs,run,sc,ac,cb,sw,cue){
   var dur=7200000;
-  return {v:1,ep:1,at:Date.now(),run:run,el:Math.max(0,dur-remMs),dur:dur,sc:sc,ac:ac,cb:cb,sw:sw,cue:cue||{home:'yellow',away:'white'}};
+  return {v:1,ep:1,at:Date.now()+OFF,run:run,el:Math.max(0,dur-remMs),dur:dur,sc:sc,ac:ac,cb:cb,sw:sw,cue:cue||{home:'yellow',away:'white'}};
 }
 function pvToday(){var d=new Date(),m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd;}
+function pvThree(d){
+  var R=[],T='Assiniboia 1',V='Norwood 4',U='Unit #283';
+  R.push(pvRow('26-27w07-07',d,U,'Rick Sparling','-30',200,'Curt Beaudoin','10',171,'Final',null,T,V,'Win','Loss'));
+  R.push(pvRow('26-27w07-07',d,U,'Trevor Westwood','-45',160,'Ayo Abraham-Ajayi','30',171,'Live',pvSt(4452000,true,[160,171],'away',{home:0,away:27},0),T,V));
+  R.push(pvRow('26-27w07-07',d,U,'Dave Philp','-60',57,'Alan Simpson','10',133,'Live',pvSt(5500000,true,[57,133],'home',{home:34,away:0},0),T,V));
+  R.push(pvRow('26-27w07-07',d,U,'Darryl Yeo','0',12,'Warren Dyer','-15',9,'Live',pvSt(7000000,true,[12,9],'away',{home:0,away:3},0),T,V));
+  R.push(pvRow('26-27w07-01',d,'Norwood','Wayne Moar','-105',142,'Bob Davis','25',118,'Live',pvSt(4452000,true,[142,118],'home',{home:34,away:0},0),'Norwood 2','Assiniboia 1'));
+  R.push(pvRow('26-27w07-05',d,'WSO','Alan Simpson','-60',33,'Dave Philp','10',57,'Live',pvSt(6500000,true,[33,57],'away',{home:0,away:8},0),'WSO 1','St James'));
+  return R;
+}
 function pvRows(){
   var d=pvToday(),R=[],sc=PV_SCEN;
+  if(sc==='three')return pvThree(d);
   var rem1=4452000,rem2=1900000,run1=true;
   if(sc==='last5'){rem1=262000;rem2=52000;}
   if(sc==='time'){rem1=0;rem2=1900000;}
@@ -156,7 +168,7 @@ function previewFetch(cb){
 }
 (function(){
   var bar=document.getElementById('pvbar');bar.style.display='flex';
-  var S=[['live','Live'],['last5','Last 5 min / last minute'],['time','TIME'],['paused','Table 1 paused'],['record','Record break (147)'],['onetable','One table waiting'],['empty','Norwood idle'],['alone','No other venues'],['offline','Fetch fails']];
+  var S=[['live','Live'],['last5','Last 5 min / last minute'],['time','TIME'],['paused','Table 1 paused'],['record','Record break (147)'],['onetable','One table waiting'],['empty','Norwood idle'],['alone','No other venues'],['offline','Fetch fails'],['three','Unit 283: 3 live tables']];
   var h='<b>PREVIEW</b>';
   for(var i=0;i<S.length;i++)h+='<button data-s="'+S[i][0]+'"'+(i===0?' class="on"':'')+'>'+S[i][1]+'</button>';
   h+='<button data-s="_picker">Show venue picker</button><button data-s="_elm">Open Elmwood</button><button data-s="_nor">Open Norwood</button>';
@@ -166,6 +178,7 @@ function previewFetch(cb){
     if(s==='_picker'){clearVenue();showPicker();return;}
     if(s==='_elm'){var v=findVenue('elmwood');saveVenue(v);openBoard(v);return;}
     if(s==='_nor'){var v2=findVenue('norwood');saveVenue(v2);openBoard(v2);return;}
+    if(s==='three'){var v3=findVenue('unit283');saveVenue(v3);openBoard(v3);}
     if(s==='record'&&window.pvResetSeen)window.pvResetSeen();
     PV_SCEN=s;var bs=bar.getElementsByTagName('button');
     for(var k=0;k<bs.length;k++)bs[k].className=bs[k].getAttribute('data-s')===s?'on':'';
@@ -264,6 +277,10 @@ window.addEventListener('load',function(){
 <script>
 var PREVIEW=true;
 var API='https://script.google.com/macros/s/AKfycbyRwfSB_zPbzaiQnHYSzNtEoeRSI4ApSOsLCldELum1jui8bDSLMD11AYZJiyVJnBFt/exec';
+var OFF=0;
+function clockSync(){var best=null;function step(i){if(i>=3){if(best&&best.rtt<6000)OFF=Math.round(best.off);return}var t0=Date.now(),x=new XMLHttpRequest(),done=false;function fin(){if(done)return;done=true;step(i+1)}try{x.open('GET',API+'?time=1&_='+t0,true);x.timeout=8000;x.onload=function(){try{var j=JSON.parse(x.responseText),t1=Date.now();if(j&&+j.t>0){var r=t1-t0;if(!best||r<best.rtt)best={rtt:r,off:+j.t-(t0+t1)/2}}}catch(e){}fin()};x.onerror=fin;x.ontimeout=fin;x.send()}catch(e){fin()}}step(0)}
+setTimeout(clockSync,1500);setInterval(clockSync,300000);
+
 var ROT_MS=10000, POLL_MS=7000, RELOAD_MS=3600000, STALE_MS=4*3600000;
 var STORE_KEY='wvebl-tv-venue';
 var VENUES=[
@@ -361,12 +378,12 @@ function venueOf(cellv){
   var n=norm(cellv);return {slug:n,name:String(cellv),short:String(cellv),alias:[n]};
 }
 function venueIndex(v){for(var i=0;i<VENUES.length;i++)if(VENUES[i].slug===v.slug)return i;return 99;}
-var others=[], otherPage=0, shownTop=[null,null], shownBot=[null,null];
+var others=[], otherPage=0, shownTop=[null,null,null], shownBot=[null,null];
 function buildTables(){
-  var out=[null,null],oth=[];
+  var out=[null,null],oth=[],mine=[];
   tables=out;others=oth;
   if(!rows.length)return;
-  var now=Date.now(),items=[];
+  var now=Date.now()+OFF,items=[];
   for(var i=0;i<rows.length;i++){
     var r=rows[i];
     if(String(cell(r,C.status)).toLowerCase()!=='live')continue;
@@ -391,9 +408,11 @@ function buildTables(){
     L.match=cnt||1;L.fid=fid;L.fx=fxInfo(fid);
     L.t=t>1?1:t;
     if(venue&&L.v.slug===venue.slug){
+      mine.push(L);
       if(!out[L.t])out[L.t]=L;else if(!out[1-L.t])out[1-L.t]=L;
     }else oth.push(L);
   }
+  if(mine.length>2){mine.sort(function(a,b){return a.t-b.t||a.match-b.match;});out[0]=mine[0];out[1]=mine[1];out[2]=mine[2];}
   oth.sort(function(a,b){return venueIndex(a.v)-venueIndex(b.v)||a.t-b.t||a.match-b.match;});
 }
 function isSwapped(L){
@@ -436,8 +455,8 @@ function smallPlayer(p){
 }
 function render(){renderTop();renderBottom();tick();}
 function renderTop(){
-  var h='';shownTop=[null,null];
-  for(var t=0;t<2;t++){
+  var h='';shownTop=[null,null,null];var n3=tables.length>2;$('boards').className=n3?'three':'';
+  for(var t=0;t<(n3?3:2);t++){
     var L=tables[t];
     h+='<div class="half h'+(t+1)+'">';
     if(!L){h+='<div class="hh">TABLE '+(t+1)+'</div>'+waitHtml(t)+'</div>';continue;}
@@ -485,8 +504,8 @@ function setClock(el,L,now){
   if(el.innerHTML!==txt)el.innerHTML=txt;
 }
 function tick(){
-  var now=Date.now();
-  for(var t=0;t<2;t++){
+  var now=Date.now()+OFF;
+  for(var t=0;t<3;t++){
     if(shownTop[t])setClock($('clk'+t),shownTop[t],now);
     if(shownBot[t])setClock($('bclk'+t),shownBot[t],now);
   }
